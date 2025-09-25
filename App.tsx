@@ -1,45 +1,34 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import * as React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import DiaryPage from "./pages/DiaryPage.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
+import { PaperProvider } from "react-native-paper";
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+const Stack = createNativeStackNavigator();
 
-  return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
+export default function App() {
+    return (
+        <GestureHandlerRootView style={{ flex: 1 }}>
+        <PaperProvider> {/* <- Wrap the whole app here */}
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen
+                        name="Diary"
+                        component={DiaryPage}
+                        options={{ headerShown: false }} // manual header in DiaryPage
+                    />
+                    <Stack.Screen
+                        name="Profile"
+                        component={ProfilePage}
+                        options={{ title: 'My Profile' }}
+                    />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </PaperProvider>
+        </GestureHandlerRootView>
+
+    );
 }
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-
-export default App;
