@@ -1,16 +1,9 @@
-import React, { useMemo, useRef, useState } from "react";
-import { View, ScrollView, StyleSheet, TouchableOpacity, Platform } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import {
-    Provider as PaperProvider,
-    Card,
-    Text,
-    TextInput,
-    Button,
-    IconButton,
-} from "react-native-paper";
-import { MotiView, AnimatePresence } from "moti";
-import { Easing } from "react-native-reanimated";
+import React, {useMemo, useRef, useState} from "react";
+import {Platform, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
+import {useNavigation} from "@react-navigation/native";
+import {Button, Card, IconButton, Provider as PaperProvider, Text, TextInput,} from "react-native-paper";
+import {AnimatePresence, MotiView} from "moti";
+import {Easing} from "react-native-reanimated";
 
 type DiaryEntry = { id: number; text: string };
 
@@ -24,7 +17,7 @@ export default function DiaryPage() {
 
     const addEntry = () => {
         if (entry.trim().length === 0) return;
-        const newEntry: DiaryEntry = { id: nextIdRef.current, text: entry };
+        const newEntry: DiaryEntry = {id: nextIdRef.current, text: entry};
         nextIdRef.current += 1;
         setLastAddedId(newEntry.id);
         setEntries((prev) => [...prev, newEntry]);
@@ -46,9 +39,10 @@ export default function DiaryPage() {
                         📔 My Diary
                     </Text>
                     <IconButton
-                        icon="account-circle"
+                        style={styles.writeButton}
                         size={30}
-                        onPress={() => navigation.navigate("Profile" as never)}
+                        icon="arrow-left"
+                        onTouchEnd={() => navigation.navigate("Profile" as never)}
                     />
                 </View>
 
@@ -60,138 +54,58 @@ export default function DiaryPage() {
                     ) : (
                         <AnimatePresence exitBeforeEnter>
                             {visibleEntries.map((item, index) => {
-                                const isNew = lastAddedId === item.id;
+                                // const isNew = lastAddedId === item.id;
+                                const isNew = true;
                                 const enterDelay = 0;
                                 return (
+                                    <View style={{overflow: "hidden"}} key={item.id}>
                                     <MotiView
+                                        style={styles.revealClip}
                                         key={item.id}
                                         from={{
+                                            width: "0%",
                                             opacity: isNew ? 0 : 1,
                                             translateX: isNew ? -8 : 0,
                                             translateY: isNew ? -4 : 8,
                                             rotateZ: index % 2 === 0 ? "-0.5deg" : "0.5deg",
                                             perspective: 800,
-                                            rotateY: isNew ? "-70deg" : "0deg",
-                                        }}
+                                            rotateY: isNew ? "-30deg" : "0deg",
+                                    }}
                                         animate={{
+                                            width: "100%",
                                             opacity: 1,
-                                            translateY: 0,
+                                            translateY: 5,
                                             translateX: 0,
-                                            rotateZ: index % 2 === 0 ? "-0.5deg" : "0.5deg",
+                                            rotateZ: index % 2 === 0 ? "-2deg" : "0.5deg",
                                             perspective: 800,
                                             rotateY: "0deg",
+
                                         }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ type: "timing", duration: 650, easing: Easing.out(Easing.cubic), delay: enterDelay }}
-                                        style={{ zIndex: 1 }}
+                                        exit={{
+                                            opacity: 0,
+                                            translateX: -100,
+                                            translateY: -100,
+                                        }}
+                                        transition={{
+                                            type: "timing",
+                                            duration: 500,
+                                            easing: Easing.out(Easing.cubic),
+                                            delay: enterDelay
+                                        }}
                                     >
-                                        <View style={styles.noteWrapper} onLayout={(e) => { }}>
-                                            {isNew && (
-                                                <>
-                                                    <MotiView
-                                                        style={styles.peelShadow}
-                                                        from={{ opacity: 0, translateX: -8 }}
-                                                        animate={{ opacity: 0.18, translateX: 0 }}
-                                                        exit={{ opacity: 0 }}
-                                                        transition={{ type: 'timing', duration: 500, easing: Easing.out(Easing.cubic) }}
-                                                    />
-                                                    <MotiView
-                                                        style={styles.cornerCurlLeft}
-                                                        from={{ opacity: 0, scale: 0.6, translateY: -8 }}
-                                                        animate={{ opacity: 1, scale: 1, translateY: 0 }}
-                                                        exit={{ opacity: 0 }}
-                                                        transition={{ type: 'timing', duration: 700, easing: Easing.out(Easing.cubic) }}
-                                                    />
-                                                </>
-                                            )}
-                                            <MotiView
-                                                style={styles.revealClip}
-                                                from={isNew ? { opacity: 0 } : {}}
-                                                animate={{ opacity: 1 }}
-                                                exit={{ opacity: 0 }}
-                                                transition={{ type: 'timing', duration: (isNew ? 800 : 560), easing: Easing.out(Easing.cubic) }}
-                                            >
-                                                {isNew && (
-                                                    <>
-                                                        <MotiView
-                                                            style={styles.curlShadowRight}
-                                                            from={{ opacity: 0.18, translateY: -10, scale: 0.7 }}
-                                                            animate={{ opacity: 0, translateY: 0, scale: 1 }}
-                                                            transition={{ type: 'timing', duration: 800, easing: Easing.out(Easing.cubic) }}
-                                                        />
-                                                        <MotiView
-                                                            style={styles.cornerCurlRight}
-                                                            from={{ opacity: 0, scale: 0.7, translateY: -8, rotateZ: '10deg' }}
-                                                            animate={{ opacity: 0.95, scale: 1, translateY: 0, rotateZ: '0deg' }}
-                                                            exit={{ opacity: 0 }}
-                                                            transition={{ type: 'timing', duration: 800, easing: Easing.out(Easing.cubic) }}
-                                                        />
-                                                    </>
-                                                )}
-                                                {isNew && (
-                                                    <MotiView
-                                                        style={styles.rightEdgeShadow}
-                                                        from={{ opacity: 0.22, translateX: -18 }}
-                                                        animate={{ opacity: 0, translateX: 0 }}
-                                                        transition={{ type: 'timing', duration: 800, easing: Easing.out(Easing.cubic) }}
-                                                    />
-                                                )}
-                                                <MotiView
-                                                    from={
-                                                        (isNew)
-                                                            ? {
-                                                                  scale: 0.9,
-                                                                  rotateZ: isNew ? "-2deg" : "0deg",
-                                                                  rotateY: isNew ? "-70deg" : "0deg",
-                                                                  translateY: -10,
-                                                                  translateX: isNew ? -12 : 0,
-                                                                  opacity: 0,
-                                                              }
-                                                            : {}
-                                                    }
-                                                    animate={
-                                                        (isNew)
-                                                            ? {
-                                                                  scale: 1,
-                                                                  rotateZ: index % 2 === 0 ? "-0.5deg" : "0.5deg",
-                                                                  rotateY: "0deg",
-                                                                  translateY: 0,
-                                                                  translateX: 0,
-                                                                  opacity: 1,
-                                                              }
-                                                            : {}
-                                                    }
-                                                    transition={{ type: 'timing', duration: 800, easing: Easing.out(Easing.cubic) }}
-                                                >
-                                                    {isNew && (
-                                                        <MotiView
-                                                            style={styles.ripple}
-                                                            from={{ opacity: 0.15, scale: 0.6 }}
-                                                            animate={{ opacity: 0, scale: 1.6 }}
-                                                            transition={{ type: 'timing', duration: 750, easing: Easing.out(Easing.cubic) }}
-                                                        />
-                                                    )}
-                                                    <Card style={styles.noteCard}>
-                                                        <Card.Content style={styles.noteContent}>
-                                                            {isNew && (
-                                                                <MotiView
-                                                                    style={styles.highlightOverlay}
-                                                                    from={{ opacity: 0.9 }}
-                                                                    animate={{ opacity: 0 }}
-                                                                    transition={{ type: 'timing', duration: 650, easing: Easing.out(Easing.cubic) }}
-                                                                />
-                                                            )}
-                                                        <View style={styles.notePin} />
-                                                        <View style={styles.noteRedLine} />
-                                                        <Text variant="bodyLarge" style={styles.noteText}>
-                                                            {item.text}
-                                                        </Text>
-                                                        </Card.Content>
-                                                    </Card>
-                                                </MotiView>
-                                            </MotiView>
+                                        <View style={styles.noteWrapper} onLayout={(e) => {
+                                        }}>
+                                            <Card style={styles.noteCard}>
+                                                <Card.Content style={styles.noteContent}>
+                                                    <View style={styles.notePin}/>
+                                                    <View style={styles.noteRedLine}/>
+                                                    <Text variant="bodyLarge" style={styles.noteText}>
+                                                        {item.text}
+                                                    </Text>
+                                                </Card.Content>
+                                            </Card>
                                         </View>
-                                    </MotiView>
+                                    </MotiView></View>
                                 );
                             })}
                         </AnimatePresence>
@@ -211,7 +125,7 @@ export default function DiaryPage() {
 
                 {/* Input for new entry (handwriting style) */}
                 <View style={styles.inputWrapper}>
-                    <View style={styles.inputRedLine} />
+                    <View style={styles.inputRedLine}/>
                     <TextInput
                         mode="outlined"
                         label="Write your diary entry..."
@@ -259,7 +173,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: "#FFFCF3", // soft paper color
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: {width: 0, height: 4},
         shadowOpacity: 0.12,
         shadowRadius: 6,
         elevation: 3,
@@ -276,7 +190,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF3C4',
     },
     noteWrapper: {
-        position: "relative",
+        // flexShrink: 0,
+        // position: "relative",
     },
     ripple: {
         ...StyleSheet.absoluteFillObject,
@@ -284,8 +199,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#C7F9FF',
     },
     revealClip: {
-        overflow: "hidden",
-        borderRadius: 12,
+        alignSelf: "flex-start",
+        borderRadius: 20,
     },
     rightEdgeShadow: {
         position: 'absolute',
@@ -303,7 +218,7 @@ const styles = StyleSheet.create({
         height: 30,
         borderTopRightRadius: 10,
         backgroundColor: 'rgba(0,0,0,0.12)',
-        transform: [{ skewX: '-16deg' }, { skewY: '-10deg' }],
+        transform: [{skewX: '-16deg'}, {skewY: '-10deg'}],
     },
     cornerCurlRight: {
         position: 'absolute',
@@ -314,10 +229,10 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 10,
         backgroundColor: 'rgba(255,255,255,0.85)',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.12,
         shadowRadius: 3,
-        transform: [{ skewX: '-18deg' }, { skewY: '-12deg' }],
+        transform: [{skewX: '-18deg'}, {skewY: '-12deg'}],
     },
     noteText: {
         color: "#3c3a37",
@@ -342,7 +257,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: "#D94F4F",
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
+        shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.2,
         shadowRadius: 1.5,
     },
@@ -354,7 +269,7 @@ const styles = StyleSheet.create({
         height: 26,
         borderTopRightRadius: 10,
         backgroundColor: "rgba(0,0,0,0.06)",
-        transform: [{ skewX: "-18deg" }, { skewY: "-12deg" }],
+        transform: [{skewX: "-18deg"}, {skewY: "-12deg"}],
     },
     revealCover: {},
     leftToRightCover: {},
@@ -376,12 +291,12 @@ const styles = StyleSheet.create({
         height: 22,
         borderTopLeftRadius: 10,
         backgroundColor: "rgba(0,0,0,0.10)",
-        transform: [{ skewX: "16deg" }, { skewY: "10deg" }],
+        transform: [{skewX: "16deg"}, {skewY: "10deg"}],
     },
     input: {
         marginTop: 0,
         backgroundColor: "#FFFCF3",
-        fontFamily: Platform.select({ ios: "Snell Roundhand", android: "serif" }),
+        fontFamily: Platform.select({ios: "Snell Roundhand", android: "serif"}),
         color: "#1f2a44",
         lineHeight: 24,
         paddingLeft: 20,
@@ -397,7 +312,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#E9E1C9",
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 3 },
+        shadowOffset: {width: 0, height: 3},
         shadowOpacity: 0.08,
         shadowRadius: 5,
         elevation: 2,
@@ -439,7 +354,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         alignSelf: "center",
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: {width: 0, height: 4},
         shadowOpacity: 0.12,
         shadowRadius: 6,
         elevation: 3,
