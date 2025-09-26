@@ -11,7 +11,6 @@ export default function DiaryPage() {
     const [entry, setEntry] = useState("");
     const [entries, setEntries] = useState<DiaryEntry[]>([]);
     const [showAll, setShowAll] = useState(false);
-    const [lastAddedId, setLastAddedId] = useState<number | null>(null);
     const navigation = useNavigation();
     const nextIdRef = useRef(0);
 
@@ -19,7 +18,6 @@ export default function DiaryPage() {
         if (entry.trim().length === 0) return;
         const newEntry: DiaryEntry = {id: nextIdRef.current, text: entry};
         nextIdRef.current += 1;
-        setLastAddedId(newEntry.id);
         setEntries((prev) => [...prev, newEntry]);
         setEntry("");
     };
